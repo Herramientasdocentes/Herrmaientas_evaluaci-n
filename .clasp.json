@@ -1,0 +1,17 @@
+{
+  "scriptId": "1Sx87CarkE0RGgAR_MABHhadak3j6qT99uWqDlxctN205dQRSzBZPByrq",
+  "rootDir": "google-api-test",
+  "parentId": "1B6n7RSIB9RV4hapSaOTlD_FVMXIPfvGvD8b8CMQObBs",
+  "scriptExtensions": [
+    ".js",
+    ".gs"
+  ],
+  "htmlExtensions": [
+    ".html"
+  ],
+  "jsonExtensions": [
+    ".json"
+  ],
+  "filePushOrder": [],
+  "skipSubdirectories": false
+}
