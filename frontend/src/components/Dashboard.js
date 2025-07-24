@@ -1,11 +1,13 @@
+
 import React, { useEffect } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import useStore from '../store';
 import QuestionPanel from './QuestionPanel';
+import PastAssessments from './PastAssessments';
+import EvaluationCanvas from './EvaluationCanvas';
 
 function Dashboard() {
-  import PastAssessments from './PastAssessments';
   const { token, files, setFiles, logout, setQuestions, setLoading } = useStore();
 
   // Función para cargar las preguntas de un archivo específico
