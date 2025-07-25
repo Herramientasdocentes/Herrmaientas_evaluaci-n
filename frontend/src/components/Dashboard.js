@@ -9,6 +9,8 @@ import EvaluationCanvas from './EvaluationCanvas';
 
 function Dashboard() {
   const { token, files, setFiles, logout, setQuestions, setLoading } = useStore();
+  // Define la URL base de la API
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   // Función para cargar las preguntas de un archivo específico
   const loadQuestions = async (fileId) => {
@@ -16,7 +18,7 @@ function Dashboard() {
     setQuestions([]); // Limpiamos las preguntas anteriores
     try {
       const config = { headers: { 'x-auth-token': token } };
-      const response = await axios.get(`http://localhost:5000/api/banco/preguntas/${fileId}`, config);
+      const response = await axios.get(`${API_URL}/api/banco/preguntas/${fileId}`, config);
       setQuestions(response.data);
     } catch (error) {
       console.error('Error al cargar las preguntas:', error);
@@ -35,7 +37,7 @@ function Dashboard() {
             'x-auth-token': token,
           },
         };
-        const response = await axios.get('http://localhost:5000/api/banco', config);
+        const response = await axios.get(`${API_URL}/api/banco`, config);
         setFiles(response.data);
       } catch (error) {
         console.error('Error al obtener los archivos:', error);

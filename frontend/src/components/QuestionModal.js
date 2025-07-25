@@ -15,6 +15,8 @@ const initialState = {
 function QuestionModal({ open, onClose, onQuestionUpdated, editingQuestion }) {
   const token = useStore((state) => state.token);
   const [formData, setFormData] = useState(initialState);
+// Define la URL base de la API
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     if (editingQuestion) {
@@ -33,10 +35,10 @@ function QuestionModal({ open, onClose, onQuestionUpdated, editingQuestion }) {
     try {
       const config = { headers: { 'x-auth-token': token } };
       if (editingQuestion) {
-        await axios.put(`http://localhost:5000/api/questions/${editingQuestion._id}`, formData, config);
+        await axios.put(`${API_URL}/api/questions/${editingQuestion._id}`, formData, config);
         toast.success('¡Pregunta actualizada con éxito!');
       } else {
-        await axios.post('http://localhost:5000/api/questions', formData, config);
+        await axios.post(`${API_URL}/api/questions`, formData, config);
         toast.success('¡Pregunta creada con éxito!');
       }
       onQuestionUpdated();

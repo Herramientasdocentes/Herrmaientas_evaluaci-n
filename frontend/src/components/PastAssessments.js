@@ -9,6 +9,8 @@ function PastAssessments() {
     const fetchPastAssessments = async () => {
       try {
         const config = { headers: { 'x-auth-token': token } };
+        // Define la URL base de la API
+        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
         const response = await axios.get('http://localhost:5000/api/evaluaciones/mis-evaluaciones', config);
         setPastAssessments(response.data);
       } catch (error) {

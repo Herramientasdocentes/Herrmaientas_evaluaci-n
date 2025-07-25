@@ -8,12 +8,14 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  // Define la URL base de la API
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
   const setToken = useStore((state) => state.setToken);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      const response = await axios.post(`${API_URL}/api/auth/login`, { email, password });
       toast.success('¡Inicio de sesión exitoso!');
       setToken(response.data.token);
     } catch (error) {
