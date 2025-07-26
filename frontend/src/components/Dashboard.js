@@ -10,7 +10,7 @@ import EvaluationCanvas from './EvaluationCanvas';
 function Dashboard() {
   const { token, files, setFiles, logout, setQuestions, setLoading } = useStore();
   // Define la URL base de la API
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  const API_URL = process.env.REACT_APP_API_URL || 'https://herrmaientas-evaluaci-n.onrender.com';
 
   // Función para cargar las preguntas de un archivo específico
   const loadQuestions = async (fileId) => {
