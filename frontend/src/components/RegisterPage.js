@@ -1,25 +1,31 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import useStore from '../store';
 import { toast } from 'react-toastify';
 import { Avatar, Button, TextField, Box, Typography, Container } from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-function LoginPage({ onSwitchToRegister }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const setToken = useStore((state) => state.setToken);
+function RegisterPage({ onSwitchToLogin }) {
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    password: '',
+  });
+
+  const { nombre, email, password } = formData;
+
+  const onChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${API_URL}/api/auth/login`, { email, password });
-      toast.success('¡Inicio de sesión exitoso!');
-      setToken(response.data.token);
+      await axios.post(`${API_URL}/api/auth/register`, { nombre, email, password });
+      toast.success('¡Registro exitoso! Ahora puedes iniciar sesión.');
+      onSwitchToLogin();
     } catch (error) {
-      toast.error('Credenciales inválidas');
+      const msg = error.response?.data?.msg || 'Error en el registro.';
+      toast.error(msg);
     }
   };
 
@@ -34,12 +40,24 @@ function LoginPage({ onSwitchToRegister }) {
         }}
       >
         <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-          <LockOutlinedIcon />
+          <PersonAddIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Iniciar Sesión
+          Crear Cuenta
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="nombre"
+            label="Nombre Completo"
+            name="nombre"
+            autoComplete="name"
+            autoFocus
+            value={nombre}
+            onChange={onChange}
+          />
           <TextField
             margin="normal"
             required
@@ -48,9 +66,8 @@ function LoginPage({ onSwitchToRegister }) {
             label="Correo Electrónico"
             name="email"
             autoComplete="email"
-            autoFocus
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={onChange}
           />
           <TextField
             margin="normal"
@@ -60,9 +77,9 @@ function LoginPage({ onSwitchToRegister }) {
             label="Contraseña"
             type="password"
             id="password"
-            autoComplete="current-password"
+            autoComplete="new-password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={onChange}
           />
           <Button
             type="submit"
@@ -70,13 +87,13 @@ function LoginPage({ onSwitchToRegister }) {
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            Entrar
+            Registrarse
           </Button>
           <Button
             fullWidth
-            onClick={onSwitchToRegister}
+            onClick={onSwitchToLogin}
           >
-            ¿No tienes una cuenta? Regístrate
+            ¿Ya tienes una cuenta? Inicia sesión
           </Button>
         </Box>
       </Box>
@@ -84,4 +101,4 @@ function LoginPage({ onSwitchToRegister }) {
   );
 }
 
-export default LoginPage;
+export default RegisterPage;
