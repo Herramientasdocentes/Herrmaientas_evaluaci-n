@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -15,9 +14,11 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>Asistente de Evaluaciones Anluis</h1>
+        
         {/* Renderizado condicional: si hay token, muestra el Dashboard, si no, el Login */}
         {token ? <Dashboard /> : <LoginPage />}
       </header>
+      
       {/* Contenedor para las notificaciones */}
       <ToastContainer
         position="top-right"
