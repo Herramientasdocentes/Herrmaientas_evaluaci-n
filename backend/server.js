@@ -7,6 +7,10 @@ const PORT = process.env.PORT || 3001;
 app.use(cors()); // <-- Habilita CORS para todas las rutas
 app.use(express.json());
 
+// Importa las rutas de autenticación
+const authRoutes = require('../routes/auth');
+app.use('/api/auth', authRoutes);
+
 app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
