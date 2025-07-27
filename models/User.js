@@ -1,27 +1,31 @@
 const mongoose = require('mongoose');
+const { isEmail } = require('validator'); // Importa la función de validación de email
 const Schema = mongoose.Schema;
 
-// Definimos el esquema del usuario
 const userSchema = new Schema({
   nombre: {
     type: String,
-    required: true // El nombre es obligatorio
+    required: [true, 'Por favor, ingrese un nombre.'], // Mensaje de error personalizado
   },
   email: {
     type: String,
-    required: true, // El email es obligatorio
-    unique: true    // No puede haber dos usuarios con el mismo email
+    required: [true, 'Por favor, ingrese un correo electrónico.'],
+    unique: true,
+    lowercase: true, // Convierte el email a minúsculas antes de guardarlo
+    validate: [isEmail, 'Por favor, ingrese un correo electrónico válido.'], // Validación de formato
   },
   password: {
     type: String,
-    required: true // La contraseña es obligatoria
+    required: [true, 'Por favor, ingrese una contraseña.'],
+    minlength: [6, 'La contraseña debe tener al menos 6 caracteres.'], // Validación de largo mínimo
   },
   rol: {
     type: String,
-    enum: ['docente', 'administrador'], // El rol solo puede ser uno de estos dos valores
-    default: 'docente' // Por defecto, un nuevo usuario es 'docente'
-  }
+    enum: ['docente', 'administrador'],
+    default: 'docente',
+  },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 });
 
-// Creamos y exportamos el modelo para que pueda ser usado en otras partes de la aplicación
 module.exports = mongoose.model('User', userSchema);

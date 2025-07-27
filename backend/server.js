@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan'); // <-- 1. Importa morgan
 const connectDB = require('./config/db');
-const morgan = require('morgan');
 
 const app = express();
 
