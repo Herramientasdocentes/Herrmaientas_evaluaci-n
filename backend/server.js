@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const morgan = require('morgan'); // <-- 1. Importa morgan
 const connectDB = require('./config/db');
 const morgan = require('morgan');
 
@@ -26,12 +27,11 @@ const corsOptions = {
 // Habilitar CORS con las opciones específicas
 app.use(cors(corsOptions));
 
+// Middleware de Logging (en modo 'dev' para desarrollo)
+app.use(morgan('dev')); // <-- 2. Usa morgan aquí
+
 // Conectar a la Base de Datos
 connectDB();
-
-// Middlewares
-app.use(express.json({ extended: false }));
-app.use(morgan('dev'));
 
 // Definir Rutas
 app.use('/api/auth', require('./routes/auth'));
