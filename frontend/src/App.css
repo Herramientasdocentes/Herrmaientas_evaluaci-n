@@ -12,3 +12,8 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
+
+/* Mejora el contraste del label de contraseña para accesibilidad WCAG 2 AA */
+#password-label {
+  color: #fff !important;
+}

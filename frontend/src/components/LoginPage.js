@@ -72,12 +72,18 @@ function LoginPage({ onSwitchToRegister }) {
           >
             Entrar
           </Button>
-          <Button
-            fullWidth
-            onClick={onSwitchToRegister}
-          >
-            ¿No tienes una cuenta? Regístrate
-          </Button>
+          <Grid container>
+            <Grid item xs>
+              <Button component={Link} to="/forgot-password" size="small">
+                ¿Olvidaste tu contraseña?
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button onClick={onSwitchToRegister} size="small">
+                ¿No tienes una cuenta? Regístrate
+              </Button>
+            </Grid>
+          </Grid>
         </Box>
       </Box>
     </Container>
