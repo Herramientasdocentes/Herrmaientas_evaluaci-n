@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Question = require('../../models/Question');
-const auth = require('../../middleware/auth');
+const Question = require('../models/Question');
+const auth = require('../middleware/auth');
 
 
 // @route   GET /api/questions
