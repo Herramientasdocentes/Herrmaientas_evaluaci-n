@@ -8,6 +8,8 @@ import {
 } from '@mui/material';
 import QuestionModal from './QuestionModal';
 
+import Pagination from '@mui/material/Pagination'; // <-- Importa el componente de paginación
+
 function QuestionBankManager() {
   const token = useStore((state) => state.token);
   const [questions, setQuestions] = useState([]);
@@ -18,6 +20,11 @@ function QuestionBankManager() {
 
   const fetchQuestions = useCallback(async () => {
     setIsLoading(true);
+
+  // Nuevos estados para la paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
     try {
       const config = {
         headers: { 'x-auth-token': token },
@@ -36,9 +43,15 @@ function QuestionBankManager() {
 
   useEffect(() => {
     fetchQuestions();
+
   }, [fetchQuestions]);
 
   const handleFilterChange = (e) => {
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
