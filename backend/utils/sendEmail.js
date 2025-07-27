@@ -1,24 +1,45 @@
+
 const nodemailer = require('nodemailer');
 
+// Utilidad para interpolar variables en la plantilla
+function renderTemplate(template, variables = {}) {
+  let output = template;
+  for (const [key, value] of Object.entries(variables)) {
+    const regex = new RegExp(`{{\s*${key}\s*}}`, 'g');
+    output = output.replace(regex, value);
+  }
+  return output;
+}
+
+/**
+ * options: {
+ *   email: string,
+ *   subject: string,
+ *   template: string, // HTML con {{variable}}
+ *   variables: object // { nombre: 'Juan', enlace: '...' }
+ * }
+ */
 const sendEmail = async (options) => {
-  // 1. Crear un "transportador" - el servicio que enviará el correo (Gmail en este caso)
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.EMAIL_USER, // Tu correo desde el .env
-      pass: process.env.EMAIL_PASS, // Tu contraseña de aplicación desde el .env
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
     },
   });
 
-  // 2. Definir las opciones del correo (destinatario, asunto, cuerpo del mensaje)
+  // Renderizar el cuerpo del mensaje usando la plantilla y variables
+  const htmlMessage = options.template
+    ? renderTemplate(options.template, options.variables)
+    : options.message;
+
   const mailOptions = {
     from: `Asistente de Evaluaciones Anluis <${process.env.EMAIL_USER}>`,
     to: options.email,
     subject: options.subject,
-    html: options.message, // Usamos HTML para poder incluir enlaces
+    html: htmlMessage,
   };
 
-  // 3. Enviar el correo
   await transporter.sendMail(mailOptions);
 };
 
