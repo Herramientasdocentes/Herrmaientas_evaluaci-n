@@ -1,3 +1,7 @@
+// Endpoint raíz para verificación
+app.get('/', (req, res) => {
+  res.send('API Asistente de Evaluaciones funcionando');
+});
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan'); // <-- 1. Importa morgan
