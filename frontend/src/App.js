@@ -44,17 +44,5 @@ function App() {
     </Router>
   );
 }
-      </div>
-    </Router>
-  );
-}
-
-function AuthPage() {
-  const [showRegister, setShowRegister] = React.useState(false);
-  if (showRegister) {
-    return <RegisterPage onSwitchToLogin={() => setShowRegister(false)} />;
-  }
-  return <LoginPage onSwitchToRegister={() => setShowRegister(true)} />;
-}
 
 export default App;
