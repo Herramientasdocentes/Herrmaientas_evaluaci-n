@@ -18,7 +18,8 @@ function LoginPage({ onSwitchToRegister }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post(`${API_URL}/api/auth/login`, { email, password });
+      const apiUrl = API_URL.replace(/\/$/, '');
+      const response = await axios.post(`${apiUrl}/api/auth/login`, { email, password });
       toast.success('¡Inicio de sesión exitoso!');
       setToken(response.data.token);
     } catch (error) {
