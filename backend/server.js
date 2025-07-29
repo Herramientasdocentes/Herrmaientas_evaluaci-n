@@ -15,6 +15,7 @@ app.get('/', (req, res) => {
 // Lista de dominios permitidos
 const allowedOrigins = [
   'https://herrmaientas-evaluaci-n.vercel.app',
+  'https://herrmaientas-evaluaci-4kyy4a2kl-herramientas-projects.vercel.app',
   // Si tienes otras URLs de Vercel (de previews), puedes añadirlas aquí
 ];
 
