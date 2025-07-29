@@ -1,5 +1,40 @@
 ---
 
+# Solución de Error Frecuente: CORS y dominios de frontend
+
+## Error
+```
+Access to XMLHttpRequest at 'https://<tu-backend>/api/...' from origin 'https://<tu-frontend>' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+```
+
+## Explicación Técnica
+Este error ocurre cuando el backend no permite solicitudes desde el dominio del frontend. Cada vez que Vercel genera una nueva URL de preview, esa URL debe agregarse a la lista blanca de CORS en el backend (`allowedOrigins`).
+
+## Ejemplo de Error
+```js
+const allowedOrigins = [
+  'https://herrmaientas-evaluaci-n.vercel.app',
+  'https://herrmaientas-evaluaci-4kyy4a2kl-herramientas-projects.vercel.app',
+  // ...
+];
+```
+
+## Solución
+Agrega el dominio de tu frontend (incluyendo previews de Vercel) a la lista blanca de CORS en el backend y reinicia el servidor.
+
+## Elementos a Evitar
+- No dejes la lista de CORS desactualizada si cambias de dominio o generas previews.
+- No uses comodines (`*`) en producción.
+
+## Recomendación
+Mantén actualizada la lista de dominios permitidos en CORS y documenta los dominios de producción y pruebas.
+
+---
+
+**Solución aplicada:**
+Se agregó el dominio de preview de Vercel a la lista blanca de CORS en el backend.
+---
+
 # Solución de Error Frecuente: Bloque duplicado y sintaxis en App.js
 
 ## Error
