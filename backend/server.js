@@ -33,6 +33,10 @@ const corsOptions = {
 // Habilitar CORS con las opciones específicas
 app.use(cors(corsOptions));
 
+
+// Middleware para parsear JSON
+app.use(express.json());
+
 // Middleware de Logging (en modo 'dev' para desarrollo)
 app.use(morgan('dev')); // <-- 2. Usa morgan aquí
 
