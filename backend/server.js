@@ -20,6 +20,7 @@ const allowedOrigins = [
   'https://herrmaientas-evaluaci-bdnfhy90x-herramientas-projects.vercel.app', // Dominio de preview actual
   'https://herrmaientas-evaluaci-o381661py-herramientas-projects.vercel.app', // Dominio de preview actual
   'https://herrmaientas-evaluaci-e6drmu0ji-herramientas-projects.vercel.app', // Dominio de preview actual
+  'https://herrmaientas-evaluaci-e0q7pls0l-herramientas-projects.vercel.app',
   // Si tienes otras URLs de Vercel (de previews), puedes añadirlas aquí
 ];
 
