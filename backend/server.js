@@ -11,23 +11,18 @@ app.get('/', (req, res) => {
   res.send('API Asistente de Evaluaciones funcionando');
 });
 
-// --- CONFIGURACIÓN DE CORS DEFINITIVA ---
-// Lista de dominios permitidos
+// --- CONFIGURACIÓN DE CORS DINÁMICA Y SEGURA ---
 const allowedOrigins = [
-  'https://herrmaientas-evaluaci-n.vercel.app',
-  'https://herrmaientas-evaluaci-4kyy4a2kl-herramientas-projects.vercel.app',
-  'https://herrmaientas-evaluaci-10l3ts0vk-herramientas-projects.vercel.app',
-  'https://herrmaientas-evaluaci-bdnfhy90x-herramientas-projects.vercel.app', // Dominio de preview actual
-  'https://herrmaientas-evaluaci-o381661py-herramientas-projects.vercel.app', // Dominio de preview actual
-  'https://herrmaientas-evaluaci-e6drmu0ji-herramientas-projects.vercel.app', // Dominio de preview actual
-  'https://herrmaientas-evaluaci-e0q7pls0l-herramientas-projects.vercel.app',
-  // Si tienes otras URLs de Vercel (de previews), puedes añadirlas aquí
+  'https://herrmaientas-evaluaci-n.vercel.app', // Dominio de producción
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Permite solicitudes si el origen está en la lista blanca o si no hay origen (como en Postman)
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+    // Permitir dominios de la lista, todas las previews de Vercel, y solicitudes sin origen (Postman)
+    const isAllowed = allowedOrigins.includes(origin) ||
+                      /-herramientas-projects\.vercel\.app$/.test(origin);
+
+    if (!origin || isAllowed) {
       callback(null, true);
     } else {
       callback(new Error('No permitido por CORS'));
