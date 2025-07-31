@@ -11,7 +11,7 @@ function PastAssessments() {
         const config = { headers: { 'x-auth-token': token } };
         // Define la URL base de la API
         const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-        const response = await axios.get('http://localhost:5000/api/evaluaciones/mis-evaluaciones', config);
+        const response = await axios.get(`${API_URL}/api/evaluaciones/mis-evaluaciones`, config);
         setPastAssessments(response.data);
       } catch (error) {
         console.error('Error al obtener evaluaciones pasadas:', error);

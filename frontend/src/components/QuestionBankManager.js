@@ -32,7 +32,7 @@ function QuestionBankManager() {
       };
       // Define la URL base de la API
       const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-      const response = await axios.get('http://localhost:5000/api/questions', config);
+      const response = await axios.get(`${API_URL}/api/questions`, config);
       setQuestions(response.data);
     } catch (error) {
       toast.error('No se pudieron cargar las preguntas.');

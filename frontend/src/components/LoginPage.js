@@ -1,32 +1,31 @@
+
+// ADVERTENCIA: Este componente permite el acceso sin validación de usuario.
+// SOLO USAR EN ENTORNOS DE PRUEBA O DEMO. NUNCA EN PRODUCCIÓN REAL.
+// Controlado por la variable de entorno REACT_APP_DEMO_MODE.
 import React, { useState } from 'react';
-import axios from 'axios';
 import useStore from '../store';
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
-import { Avatar, Button, TextField, Box, Typography, Container, Grid, CircularProgress } from '@mui/material';
+import { Avatar, Button, Box, Typography, Container, CircularProgress } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-function LoginPage({ onSwitchToRegister }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+function LoginPage() {
   const setToken = useStore((state) => state.setToken);
+  const [loading, setLoading] = useState(false);
+  // Detecta modo demo por variable de entorno
+  const demoMode = process.env.REACT_APP_DEMO_MODE === 'true';
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const apiUrl = API_URL.replace(/\/$/, '');
-      const response = await axios.post(`${apiUrl}/api/auth/login`, { email, password });
-      toast.success('¡Inicio de sesión exitoso!');
-      setToken(response.data.token);
-    } catch (error) {
-      toast.error('Credenciales inválidas');
-    } finally {
-      setLoading(false);
+  const handleLogin = () => {
+    if (!demoMode) {
+      toast.error('El modo demo no está habilitado. Contacta al administrador.');
+      return;
     }
+    setLoading(true);
+    setTimeout(() => {
+      setToken('demo-token');
+      toast.success('¡Ingreso exitoso!');
+      setLoading(false);
+    }, 500);
   };
 
   return (
@@ -36,33 +35,22 @@ function LoginPage({ onSwitchToRegister }) {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Iniciar Sesión
+          Ingresar
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-          <TextField margin="normal" required fullWidth id="email" label="Correo Electrónico" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <TextField margin="normal" required fullWidth name="password" label="Contraseña" type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Entrar'}
-          </Button>
-          <Grid container>
-            <Grid item xs>
-              <Button component={Link} to="/forgot-password" size="small" disabled={loading}>
-                ¿Olvidaste tu contraseña?
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button onClick={onSwitchToRegister} size="small" disabled={loading}>
-                ¿No tienes una cuenta? Regístrate
-              </Button>
-            </Grid>
-          </Grid>
-        </Box>
+        {!demoMode && (
+          <Typography color="error" sx={{ mt: 2, mb: 2 }}>
+            El modo demo no está habilitado. Contacta al administrador.
+          </Typography>
+        )}
+        <Button
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+          onClick={handleLogin}
+          disabled={loading}
+        >
+          {loading ? <CircularProgress size={24} color="inherit" /> : 'Ingresar'}
+        </Button>
       </Box>
     </Container>
   );
