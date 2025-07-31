@@ -13,14 +13,17 @@ app.get('/', (req, res) => {
 
 // --- CONFIGURACIÓN DE CORS DINÁMICA Y SEGURA ---
 const allowedOrigins = [
-  'https://herrmaientas-evaluaci-n.vercel.app', // Dominio de producción
+  'https://herrmaientas-evaluaci-n.vercel.app', // Dominio de producción (con guion)
+  'https://herrmaientas-evaluaci.vercel.app',   // Dominio alternativo (sin guion, por si acaso)
+  'https://herrmaientas-evaluaci-lhnurgnax-herramientas-projects.vercel.app', // Dominio de despliegue actual
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
     // Permitir dominios de la lista, todas las previews de Vercel, y solicitudes sin origen (Postman)
     const isAllowed = allowedOrigins.includes(origin) ||
-                      /-herramientas-projects\.vercel\.app$/.test(origin);
+                      /-herramientas-projects\.vercel\.app$/.test(origin) ||
+                      /-evaluaci(-[a-z0-9]+)?-herramientas-projects\.vercel\.app$/.test(origin);
 
     if (!origin || isAllowed) {
       callback(null, true);
@@ -47,6 +50,7 @@ connectDB();
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/questions', require('./routes/questions'));
 app.use('/api/evaluaciones', require('./routes/assessment'));
+app.use('/api/banco', require('./routes/banco'));
 
 const PORT = process.env.PORT || 5000;
 
