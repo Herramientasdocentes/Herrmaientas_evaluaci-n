@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
 import useStore from '../store';
+import { toast } from 'react-toastify';
 
 function PastAssessments() {
   const { token, pastAssessments, setPastAssessments } = useStore();
@@ -14,6 +15,17 @@ function PastAssessments() {
         const response = await axios.get(`${API_URL}/api/evaluaciones/mis-evaluaciones`, config);
         setPastAssessments(response.data);
       } catch (error) {
+        if (error.response) {
+          if (error.response.status === 404) {
+            toast.warn('No se encontraron evaluaciones pasadas.');
+          } else if (error.response.status === 401 || error.response.status === 403) {
+            toast.error('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
+          } else {
+            toast.error('Error inesperado al obtener evaluaciones.');
+          }
+        } else {
+          toast.error('Error de red o el servidor no responde.');
+        }
         console.error('Error al obtener evaluaciones pasadas:', error);
       }
     };
