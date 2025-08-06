@@ -46,7 +46,11 @@ router.post('/login', async (req, res) => {
     if (!match) {
       return res.status(400).json({ msg: 'Credenciales inválidas.' });
     }
-    const token = jwt.sign({ id: user._id, rol: user.rol }, process.env.JWT_SECRET || 'secreto', { expiresIn: '1d' });
+        if (!process.env.JWT_SECRET) {
+      console.error('FATAL ERROR: JWT_SECRET no está definida.');
+      return res.status(500).json({ msg: 'Error interno del servidor.' });
+    }
+    const token = jwt.sign({ id: user._id, rol: user.rol }, process.env.JWT_SECRET, { expiresIn: '1d' });
     res.json({ token });
   } catch (err) {
     console.error('Error en /login:', err);

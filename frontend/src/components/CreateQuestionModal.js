@@ -1,31 +1,50 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import useStore from '../store';
 import { toast } from 'react-toastify';
+import useStore from '../store';
 import {
-  Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField,
-  Select, MenuItem, FormControl, InputLabel
+  Button,
+  Modal,
+  Box,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Typography,
 } from '@mui/material';
 
-const initialState = {
-  pregunta: '', opcionA: '', opcionB: '', opcionC: '', opcionD: '',
-  respuestaCorrecta: 'A', puntaje: 1, oa: '', dificultad: 'Intermedio'
+const API_URL = process.env.REACT_APP_API_URL || 'https://herrmaientas-evaluaci-n.onrender.com';
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+  maxHeight: '90vh',
+  overflowY: 'auto',
 };
 
-function QuestionModal({ open, onClose, onQuestionUpdated, editingQuestion }) {
-  const token = useStore((state) => state.token);
-  const [formData, setFormData] = useState(initialState);
-// Define la URL base de la API
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
-
-  useEffect(() => {
-    if (editingQuestion) {
-      setFormData(editingQuestion);
-    } else {
-      setFormData(initialState);
-    }
-  }, [editingQuestion, open]);
+function CreateQuestionModal({ open, handleClose, onQuestionCreated }) {
+  const { token } = useStore();
+  const [formData, setFormData] = useState({
+    pregunta: '',
+    opcionA: '',
+    opcionB: '',
+    opcionC: '',
+    opcionD: '',
+    respuestaCorrecta: 'A',
+    puntaje: 1,
+    oa: '',
+    indicador: '',
+    habilidad: '',
+    dificultad: 'Intermedio',
+  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -35,47 +54,90 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
     e.preventDefault();
     try {
       const config = { headers: { 'x-auth-token': token } };
-      if (editingQuestion) {
-            await axios.put(`${API_URL}/api/questions/${editingQuestion._id}`, formData, config);
-        toast.success('¡Pregunta actualizada con éxito!');
-      } else {
-            await axios.post(`${API_URL}/api/questions`, formData, config);
-        toast.success('¡Pregunta creada con éxito!');
-      }
-      onQuestionUpdated();
-      onClose();
+      const response = await axios.post(`${API_URL}/api/questions`, formData, config);
+      toast.success('¡Pregunta creada exitosamente!');
+      onQuestionCreated(response.data); // Llama al callback para actualizar la lista
+      handleClose(); // Cierra el modal
     } catch (error) {
-      toast.error('Ocurrió un error.');
+      console.error('Error al crear la pregunta:', error.response?.data || error.message);
+      const errorMsg = error.response?.data?.errors?.[0]?.msg || 'No se pudo crear la pregunta.';
+      toast.error(errorMsg);
     }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{editingQuestion ? 'Editar Pregunta' : 'Crear Nueva Pregunta'}</DialogTitle>
-      <DialogContent>
-        <TextField name="pregunta" label="Enunciado" fullWidth margin="dense" value={formData.pregunta} onChange={handleChange} />
-        <TextField name="opcionA" label="Alternativa A" fullWidth margin="dense" value={formData.opcionA} onChange={handleChange} />
-        <TextField name="opcionB" label="Alternativa B" fullWidth margin="dense" value={formData.opcionB} onChange={handleChange} />
-        <TextField name="opcionC" label="Alternativa C" fullWidth margin="dense" value={formData.opcionC} onChange={handleChange} />
-        <TextField name="opcionD" label="Alternativa D" fullWidth margin="dense" value={formData.opcionD} onChange={handleChange} />
-        <FormControl fullWidth margin="dense">
+    <Modal open={open} onClose={handleClose}>
+      <Box sx={style} component="form" onSubmit={handleSubmit}>
+        <Typography variant="h6" component="h2">
+          Crear Nueva Pregunta
+        </Typography>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          label="Texto de la Pregunta"
+          name="pregunta"
+          value={formData.pregunta}
+          onChange={handleChange}
+          multiline
+          rows={3}
+        />
+        <TextField margin="normal" required fullWidth label="Opción A" name="opcionA" value={formData.opcionA} onChange={handleChange} />
+        <TextField margin="normal" required fullWidth label="Opción B" name="opcionB" value={formData.opcionB} onChange={handleChange} />
+        <TextField margin="normal" required fullWidth label="Opción C" name="opcionC" value={formData.opcionC} onChange={handleChange} />
+        <TextField margin="normal" required fullWidth label="Opción D" name="opcionD" value={formData.opcionD} onChange={handleChange} />
+        
+        <FormControl fullWidth margin="normal">
           <InputLabel>Respuesta Correcta</InputLabel>
-          <Select name="respuestaCorrecta" value={formData.respuestaCorrecta} label="Respuesta Correcta" onChange={handleChange}>
+          <Select name="respuestaCorrecta" value={formData.respuestaCorrecta} onChange={handleChange}>
             <MenuItem value="A">A</MenuItem>
             <MenuItem value="B">B</MenuItem>
             <MenuItem value="C">C</MenuItem>
             <MenuItem value="D">D</MenuItem>
           </Select>
         </FormControl>
-        <TextField name="oa" label="OA" fullWidth margin="dense" value={formData.oa} onChange={handleChange} />
-        {/* Aquí se pueden añadir más campos como puntaje, habilidad, etc. */}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancelar</Button>
-        <Button onClick={handleSubmit} variant="contained">Guardar Cambios</Button>
-      </DialogActions>
-    </Dialog>
+
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          label="Puntaje"
+          name="puntaje"
+          type="number"
+          value={formData.puntaje}
+          onChange={handleChange}
+        />
+
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          label="Objetivo de Aprendizaje (OA)"
+          name="oa"
+          value={formData.oa}
+          onChange={handleChange}
+        />
+
+        <TextField margin="normal" fullWidth label="Indicador" name="indicador" value={formData.indicador} onChange={handleChange} />
+        <TextField margin="normal" fullWidth label="Habilidad" name="habilidad" value={formData.habilidad} onChange={handleChange} />
+
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Dificultad</InputLabel>
+          <Select name="dificultad" value={formData.dificultad} onChange={handleChange}>
+            <MenuItem value="Fácil">Fácil</MenuItem>
+            <MenuItem value="Intermedio">Intermedio</MenuItem>
+            <MenuItem value="Adecuado">Adecuado</MenuItem>
+            <MenuItem value="Desafiante">Desafiante</MenuItem>
+          </Select>
+        </FormControl>
+
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+          <Button onClick={handleClose} sx={{ mr: 1 }}>Cancelar</Button>
+          <Button type="submit" variant="contained">Crear Pregunta</Button>
+        </Box>
+      </Box>
+    </Modal>
   );
 }
 
-export default QuestionModal;
+export default CreateQuestionModal;

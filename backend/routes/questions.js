@@ -1,7 +1,47 @@
 const express = require('express');
 const router = express.Router();
+const { check, validationResult } = require('express-validator');
 const Question = require('../models/Question');
 const auth = require('../middleware/auth');
+
+// @route   POST api/questions
+// @desc    Crear una nueva pregunta
+// @access  Private
+router.post(
+  '/',
+  [
+    auth,
+    [
+      check('pregunta', 'La pregunta es obligatoria').not().isEmpty(),
+      check('opcionA', 'La opción A es obligatoria').not().isEmpty(),
+      check('opcionB', 'La opción B es obligatoria').not().isEmpty(),
+      check('opcionC', 'La opción C es obligatoria').not().isEmpty(),
+      check('opcionD', 'La opción D es obligatoria').not().isEmpty(),
+      check('respuestaCorrecta', 'La respuesta correcta es obligatoria').isIn(['A', 'B', 'C', 'D']),
+      check('puntaje', 'El puntaje es obligatorio y debe ser un número').isNumeric(),
+      check('oa', 'El Objetivo de Aprendizaje (OA) es obligatorio').not().isEmpty(),
+    ],
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const newQuestion = new Question({
+        ...req.body,
+        creador: req.user.id, // Asignamos el creador a partir del token de autenticación
+      });
+
+      const question = await newQuestion.save();
+      res.status(201).json(question);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Error del Servidor');
+    }
+  }
+);
 
 
 // @route   GET /api/questions

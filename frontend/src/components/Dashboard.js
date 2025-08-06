@@ -12,14 +12,15 @@ function Dashboard() {
   // Define la URL base de la API
   const API_URL = process.env.REACT_APP_API_URL || 'https://herrmaientas-evaluaci-n.onrender.com';
 
-  // Función para cargar las preguntas de un archivo específico
-  const loadQuestions = async (fileId) => {
+  // Función para cargar las preguntas de un OA específico
+  const loadQuestionsByOA = async (oa) => {
     setLoading(true);
     setQuestions([]); // Limpiamos las preguntas anteriores
     try {
       const config = { headers: { 'x-auth-token': token } };
-      const response = await axios.get(`${API_URL}/api/banco/preguntas/${fileId}`, config);
-      setQuestions(response.data);
+      // Llamamos a la ruta de questions, filtrando por oa
+      const response = await axios.get(`${API_URL}/api/questions?oa=${oa}`, config);
+      setQuestions(response.data.questions); // La API devuelve un objeto con una propiedad 'questions'
     } catch (error) {
       console.error('Error al cargar las preguntas:', error);
       toast.error('No se pudieron cargar las preguntas.');
@@ -28,9 +29,9 @@ function Dashboard() {
     }
   };
 
-  // useEffect para cargar los archivos al iniciar
+  // useEffect para cargar los OAs (bancos) al iniciar
   useEffect(() => {
-    const fetchFiles = async () => {
+    const fetchOAs = async () => {
       try {
         const config = {
           headers: {
@@ -38,15 +39,15 @@ function Dashboard() {
           },
         };
         const response = await axios.get(`${API_URL}/api/banco`, config);
-        setFiles(response.data);
+        setFiles(response.data); // El backend ahora devuelve el formato correcto
       } catch (error) {
-        console.error('Error al obtener los archivos:', error);
+        console.error('Error al obtener los bancos de preguntas:', error);
         toast.error('Tu sesión puede haber expirado. Por favor, inicia sesión de nuevo.');
         logout();
       }
     };
     if (token) {
-      fetchFiles();
+      fetchOAs();
     }
   }, [token, setFiles, logout]);
 
@@ -54,16 +55,16 @@ function Dashboard() {
     <div>
       <h2>Panel del Docente</h2>
       <button onClick={logout}>Cerrar Sesión</button>
-      <h3>Bancos de Preguntas Disponibles:</h3>
+      <h3>Bancos de Preguntas por OA:</h3>
       <ul>
         {files.length > 0 ? (
-          files.map((file) => (
-            <li key={file.id} onClick={() => loadQuestions(file.id)} style={{ cursor: 'pointer', textDecoration: 'underline' }}>
-              {file.name}
+          files.map((banco) => (
+            <li key={banco.id} onClick={() => loadQuestionsByOA(banco.id)} style={{ cursor: 'pointer', textDecoration: 'underline' }}>
+              {banco.name}
             </li>
           ))
         ) : (
-          <p>Cargando archivos...</p>
+          <p>No se encontraron bancos de preguntas. Agregue preguntas para verlos aquí.</p>
         )}
       </ul>
       {/* Paneles lado a lado */}

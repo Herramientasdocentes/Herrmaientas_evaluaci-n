@@ -1,3 +1,6 @@
+const express = require('express');
+const router = express.Router();
+
 // Ruta para obtener evaluaciones del usuario (demo)
 router.get('/mis-evaluaciones', (req, res) => {
   // En modo demo, responde con datos simulados
@@ -8,8 +11,6 @@ router.get('/mis-evaluaciones', (req, res) => {
     ]
   });
 });
-const express = require('express');
-const router = express.Router();
 
 // Ruta de prueba para assessment
 router.get('/', (req, res) => {
