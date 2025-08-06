@@ -2,6 +2,9 @@ import React, { useEffect } from 'react';
 import axios from 'axios';
 import useStore from '../store';
 import { toast } from 'react-toastify';
+import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Link } from '@mui/material';
+
+const API_URL = process.env.REACT_APP_API_URL || 'https://herrmaientas-evaluaci-n.onrender.com';
 
 function PastAssessments() {
   const { token, pastAssessments, setPastAssessments } = useStore();
@@ -10,23 +13,14 @@ function PastAssessments() {
     const fetchPastAssessments = async () => {
       try {
         const config = { headers: { 'x-auth-token': token } };
-        // Define la URL base de la API
-        const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
         const response = await axios.get(`${API_URL}/api/evaluaciones/mis-evaluaciones`, config);
         setPastAssessments(response.data);
       } catch (error) {
-        if (error.response) {
-          if (error.response.status === 404) {
-            toast.warn('No se encontraron evaluaciones pasadas.');
-          } else if (error.response.status === 401 || error.response.status === 403) {
-            toast.error('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
-          } else {
-            toast.error('Error inesperado al obtener evaluaciones.');
-          }
-        } else {
-          toast.error('Error de red o el servidor no responde.');
-        }
         console.error('Error al obtener evaluaciones pasadas:', error);
+        // No mostramos toast de error si es un 404 (no encontrado), simplemente no se muestran datos.
+        if (error.response && error.response.status !== 404) {
+            toast.error('No se pudieron cargar las evaluaciones anteriores.');
+        }
       }
     };
 
@@ -36,32 +30,36 @@ function PastAssessments() {
   }, [token, setPastAssessments]);
 
   return (
-    <div style={{ marginTop: '40px' }}>
-      <h3>Mis Evaluaciones Creadas</h3>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr style={{ background: '#f2f2f2' }}>
-            <th style={{padding: '8px', border: '1px solid #ddd'}}>Nombre</th>
-            <th style={{padding: '8px', border: '1px solid #ddd'}}>Fecha de Creación</th>
-            <th style={{padding: '8px', border: '1px solid #ddd'}}>Enlaces</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pastAssessments.map((assessment) => (
-            <tr key={assessment._id}>
-              <td style={{padding: '8px', border: '1px solid #ddd'}}>{assessment.nombreEvaluacion}</td>
-              <td style={{padding: '8px', border: '1px solid #ddd'}}>{new Date(assessment.fechaCreacion).toLocaleDateString('es-CL')}</td>
-              <td style={{padding: '8px', border: '1px solid #ddd'}}>
-                <a href={assessment.enlaceDoc} target="_blank" rel="noopener noreferrer">Documento</a>
-                {assessment.enlaceForm && (
-                  <a href={assessment.enlaceForm} target="_blank" rel="noopener noreferrer" style={{marginLeft: '10px'}}>Formulario</a>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Box sx={{ marginTop: '40px' }}>
+      <Typography variant="h6" gutterBottom>Mis Evaluaciones Creadas</Typography>
+      {pastAssessments.length > 0 ? (
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Nombre</TableCell>
+                <TableCell>Fecha de Creación</TableCell>
+                <TableCell>Enlaces</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {pastAssessments.map((assessment) => (
+                <TableRow key={assessment._id}>
+                  <TableCell>{assessment.nombreEvaluacion}</TableCell>
+                  <TableCell>{new Date(assessment.fechaCreacion).toLocaleDateString('es-CL')}</TableCell>
+                  <TableCell>
+                    <Link href={assessment.enlaceDoc} target="_blank" rel="noopener noreferrer" sx={{ mr: 2 }}>Doc</Link>
+                    <Link href={assessment.enlaceForm} target="_blank" rel="noopener noreferrer">Form</Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      ) : (
+        <Typography variant="body2" color="textSecondary">No has creado ninguna evaluación todavía.</Typography>
+      )}
+    </Box>
   );
 }
 
