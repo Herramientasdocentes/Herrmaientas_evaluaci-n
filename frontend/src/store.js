@@ -1,9 +1,17 @@
 
 import { create } from 'zustand';
 
+// Función para obtener el estado inicial del token desde localStorage
+const getInitialToken = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('token') || null;
+  }
+  return null;
+};
+
 // Estado inicial de la aplicación, usado para resetear
 const initialState = {
-  token: null,
+  token: getInitialToken(), // Carga el token desde localStorage al inicio
   files: [],
   questions: [],
   evaluationQuestions: [],
@@ -18,10 +26,19 @@ const useStore = create((set) => ({
   // --- ACCIONES (Mutaciones del estado) ---
 
   /**
-   * Guarda el token de autenticación en el estado.
+   * Guarda el token de autenticación en el estado y en localStorage.
    * @param {string} token - El token JWT recibido del backend.
    */
-  setToken: (token) => set({ token }),
+  setToken: (token) => {
+    set({ token });
+    if (typeof window !== 'undefined') {
+      if (token) {
+        localStorage.setItem('token', token);
+      } else {
+        localStorage.removeItem('token');
+      }
+    }
+  },
 
   /**
    * Guarda la lista de archivos del banco de preguntas.
@@ -66,7 +83,12 @@ const useStore = create((set) => ({
    * Cierra la sesión del usuario y resetea el estado completo de la aplicación
    * a sus valores iniciales para asegurar que no queden datos sensibles.
    */
-  logout: () => set(initialState),
+  logout: () => {
+    set(initialState);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+    }
+  },
 }));
 
 export default useStore;
