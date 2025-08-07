@@ -26,6 +26,12 @@ const userSchema = new Schema({
   },
   passwordResetToken: String,
   passwordResetExpires: Date,
+  googleAccessToken: String,
+  googleRefreshToken: String,
+  googleExpiryDate: Date,
+  googleScope: String,
+  googleTokenType: String,
+  googleId: { type: String, unique: true, sparse: true }, // sparse: permite nulos, pero si existe, debe ser único
 });
 
 module.exports = mongoose.model('User', userSchema);
