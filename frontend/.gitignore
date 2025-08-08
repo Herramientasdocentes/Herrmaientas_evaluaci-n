@@ -1,1 +1,2 @@
-.vercel
+# Ignorar variables de entorno
+.env
