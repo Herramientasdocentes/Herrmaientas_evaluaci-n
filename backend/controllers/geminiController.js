@@ -1,4 +1,5 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+// This is a test comment to force a new deployment on Render.
 
 // Se espera que la API Key esté configurada en las variables de entorno
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
