@@ -138,45 +138,7 @@ exports.adaptQuestionForNEE = async (req, res) => {
     res.status(500).send('Error del servidor al interactuar con la API de Gemini.');
   }
 };
-  const { description, criteria, levels } = req.body;
-
-  if (!description || !criteria || !levels) {
-    return res.status(400).json({ msg: 'Se requiere descripción, criterios y niveles de logro.' });
-  }
-
-  try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
-    const prompt = `
-      Rol: Eres un experto en evaluación pedagógica.
-      Tarea: Crea una rúbrica de evaluación detallada para una tarea o pregunta de desarrollo.
-
-      Información Proporcionada por el Docente:
-      - **Descripción de la Tarea a Evaluar:** "${description}"
-      - **Criterios de Evaluación (separados por comas):** "${criteria}"
-      - **Niveles de Logro (separados por comas):** "${levels}" (Ej: Logrado, En Desarrollo, Por Lograr)
-
-      Instrucciones para la Rúbrica:
-      1.  **Estructura:** La rúbrica debe ser una tabla o una lista bien estructurada.
-      2.  **Contenido:** Para cada criterio de evaluación, describe en detalle qué se espera del estudiante para cada uno de los niveles de logro definidos.
-      3.  **Lenguaje:** Utiliza un lenguaje claro, preciso y orientado a la acción, de modo que tanto el docente como el estudiante puedan entender fácilmente las expectativas.
-
-      Formato de Respuesta: Proporciona la respuesta como un texto plano utilizando formato Markdown para crear una tabla o una lista clara y legible. Asegúrate de que la estructura sea coherente y fácil de interpretar.
-
-      Genera la rúbrica ahora.
-    `;
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-
-    res.status(200).json({ rubric: text });
-
-  } catch (error) {
-    console.error('Error al generar la rúbrica con Gemini:', error);
-    res.status(500).send('Error del servidor al interactuar con la API de Gemini.');
-  }
-};
+  
   const { pregunta, opcionA, opcionB, opcionC, opcionD, oa } = req.body;
 
   if (!pregunta || !opcionA || !opcionB || !opcionC || !opcionD) {
