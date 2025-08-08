@@ -17,7 +17,12 @@ const GoogleSheetPicker = ({ onSheetSelect }) => {
           },
         };
         const res = await axios.get('/api/sheets/drive-files', config);
-        setSheets(res.data);
+        if (Array.isArray(res.data)) {
+          setSheets(res.data);
+        } else {
+          console.error('API did not return an array for sheets:', res.data);
+          setSheets([]); // Ensure sheets is always an array
+        }
       } catch (err) {
         console.error('Error fetching Google Sheets:', err);
         setError('Error al cargar las hojas de cálculo. Asegúrate de haber iniciado sesión con Google y de tener permisos.');
@@ -41,11 +46,11 @@ const GoogleSheetPicker = ({ onSheetSelect }) => {
   return (
     <div className="google-sheet-picker">
       <h3>Selecciona una Hoja de Cálculo de Google Drive</h3>
-      {sheets.length === 0 ? (
+      {sheets && Array.isArray(sheets) && sheets.length === 0 ? (
         <p>No se encontraron hojas de cálculo en tu Google Drive. Asegúrate de que existan y de tener los permisos adecuados.</p>
       ) : (
         <ul className="list-group">
-          {sheets.map((sheet) => (
+          {sheets && Array.isArray(sheets) && sheets.map((sheet) => (
             <li
               key={sheet.id}
               className="list-group-item list-group-item-action"
