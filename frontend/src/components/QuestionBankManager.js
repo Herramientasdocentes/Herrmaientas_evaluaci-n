@@ -13,6 +13,7 @@ import ScienceIcon from '@mui/icons-material/Science'; // Icono para el análisi
 import QuestionModal from './QuestionModal';
 import AnalyzeQuestionModal from './AnalyzeQuestionModal'; // Importar el nuevo modal
 import GoogleSheetPicker from './GoogleSheetPicker';
+import ImportQuestionsModal from './ImportQuestionsModal'; // Importar el nuevo modal de importación
 import Pagination from '@mui/material/Pagination';
 
 function QuestionBankManager() {
@@ -24,6 +25,7 @@ function QuestionBankManager() {
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [isAnalyzeModalOpen, setIsAnalyzeModalOpen] = useState(false);
   const [selectedQuestionForAnalysis, setSelectedQuestionForAnalysis] = useState(null);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false); // Nuevo estado para el modal de importación
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -34,7 +36,13 @@ function QuestionBankManager() {
     try {
       const config = {
         headers: { 'x-auth-token': token },
-        params: { ...filters, page: currentPage, limit: 10 },
+        params: {
+          oa: filters.oa,
+          dificultad: filters.dificultad,
+          pregunta: filters.pregunta,
+          page: currentPage,
+          limit: 10
+        },
       };
       const response = await axios.get(`${API_URL}/api/questions`, config);
       setQuestions(response.data.questions);
@@ -87,7 +95,73 @@ function QuestionBankManager() {
   };
 
   const handleSheetSelected = async ({ id, name }) => {
-    // ... (lógica de importación existente)
+    setIsLoading(true);
+    try {
+      const config = {
+        headers: { 'x-auth-token': token },
+      };
+      await axios.post(`${API_URL}/api/sheets/import-questions`, { sheetId: id }, config);
+      toast.success(`Preguntas importadas exitosamente desde "${name}".`);
+      fetchQuestions(); // Refresh the question list
+    } catch (error) {
+      console.error('Error importing questions from Google Sheet:', error);
+      toast.error('Error al importar preguntas desde la hoja de cálculo.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // --- Handlers para Modal de Importación ---
+  const handleOpenImportModal = () => {
+    setIsImportModalOpen(true);
+  };
+
+  const handleCloseImportModal = () => {
+    setIsImportModalOpen(false);
+  };
+
+  const handleImportCSV = async (file) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const config = {
+        headers: {
+          'x-auth-token': token,
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      await axios.post(`${API_URL}/api/import/csv`, formData, config);
+      toast.success('Preguntas CSV importadas exitosamente.');
+      fetchQuestions();
+    } catch (error) {
+      console.error('Error importing CSV:', error);
+      toast.error('Error al importar preguntas desde CSV.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleImportJSON = async (file) => {
+    setIsLoading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const config = {
+        headers: {
+          'x-auth-token': token,
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+      await axios.post(`${API_URL}/api/import/json`, formData, config);
+      toast.success('Preguntas JSON importadas exitosamente.');
+      fetchQuestions();
+    } catch (error) {
+      console.error('Error importing JSON:', error);
+      toast.error('Error al importar preguntas desde JSON.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -96,11 +170,27 @@ function QuestionBankManager() {
         <Typography variant="h4" component="h1">Banco de Preguntas</Typography>
         <Box>
           <Button variant="contained" onClick={handleOpenCreateModal} sx={{ mr: 1 }}>Crear Pregunta</Button>
-          <GoogleSheetPicker onSheetSelected={handleSheetSelected} />
+          <Button variant="outlined" onClick={handleOpenImportModal} sx={{ mr: 1 }}>Importar Preguntas</Button>
+          <GoogleSheetPicker onSheetSelect={handleSheetSelected} />
         </Box>
       </Box>
-      <Box component={Paper} sx={{ p: 2, mb: 2 }}>
+      <Box component={Paper} sx={{ p: 2, mb: 2, display: 'flex', gap: 2 }}>
         <TextField name="oa" label="Filtrar por OA" variant="outlined" size="small" value={filters.oa} onChange={handleFilterChange} />
+        <FormControl variant="outlined" size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Dificultad</InputLabel>
+          <Select
+            name="dificultad"
+            value={filters.dificultad || ''}
+            onChange={handleFilterChange}
+            label="Dificultad"
+          >
+            <MenuItem value="">Todas</MenuItem>
+            <MenuItem value="Baja">Baja</MenuItem>
+            <MenuItem value="Intermedio">Intermedio</MenuItem>
+            <MenuItem value="Alta">Alta</MenuItem>
+          </Select>
+        </FormControl>
+        <TextField name="pregunta" label="Buscar por Pregunta" variant="outlined" size="small" value={filters.pregunta || ''} onChange={handleFilterChange} />
       </Box>
       <TableContainer component={Paper}>
         <Table>
@@ -151,6 +241,12 @@ function QuestionBankManager() {
         open={isAnalyzeModalOpen}
         handleClose={handleCloseAnalyzeModal}
         question={selectedQuestionForAnalysis}
+      />
+      <ImportQuestionsModal
+        open={isImportModalOpen}
+        handleClose={handleCloseImportModal}
+        onImportCSV={handleImportCSV}
+        onImportJSON={handleImportJSON}
       />
     </Container>
   );

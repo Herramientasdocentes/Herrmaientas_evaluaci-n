@@ -110,3 +110,54 @@ exports.getAssessments = async (req, res) => {
     res.status(500).send('Error del Servidor');
   }
 };
+
+exports.deleteAssessment = async (req, res) => {
+  try {
+    const assessment = await Assessment.findById(req.params.id);
+
+    if (!assessment) {
+      return res.status(404).json({ msg: 'Evaluación no encontrada' });
+    }
+
+    // Verificar que el usuario sea el creador de la evaluación
+    if (assessment.creador.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'Usuario no autorizado' });
+    }
+
+    await Assessment.findByIdAndDelete(req.params.id);
+
+    res.json({ msg: 'Evaluación eliminada exitosamente' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Error del Servidor');
+  }
+};
+
+exports.updateAssessment = async (req, res) => {
+  const { nombreEvaluacion, objetivo, enlaces } = req.body;
+
+  try {
+    let assessment = await Assessment.findById(req.params.id);
+
+    if (!assessment) {
+      return res.status(404).json({ msg: 'Evaluación no encontrada' });
+    }
+
+    // Verificar que el usuario sea el creador de la evaluación
+    if (assessment.creador.toString() !== req.user.id) {
+      return res.status(401).json({ msg: 'Usuario no autorizado' });
+    }
+
+    // Actualizar solo los campos permitidos
+    assessment.nombreEvaluacion = nombreEvaluacion || assessment.nombreEvaluacion;
+    assessment.objetivo = objetivo || assessment.objetivo;
+    assessment.enlaces = enlaces || assessment.enlaces; // Permitir actualizar enlaces si es necesario
+
+    await assessment.save();
+
+    res.json(assessment);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Error del Servidor');
+  }
+};

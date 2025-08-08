@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -49,12 +48,14 @@ connectDB();
 
 // Definir Rutas
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/users', require('./routes/user')); // Nueva ruta para gestión de usuarios
 app.use('/api/questions', require('./routes/questions'));
 app.use('/api/evaluaciones', require('./routes/assessment'));
 app.use('/api/banco', require('./routes/banco'));
 app.use('/api/sheets', require('./routes/sheets'));
 app.use('/api/classroom', require('./routes/classroom'));
 app.use('/api/gemini', require('./routes/gemini'));
+app.use('/api/import', require('./routes/import')); // Add this line
 
 const PORT = process.env.PORT || 5000;
 

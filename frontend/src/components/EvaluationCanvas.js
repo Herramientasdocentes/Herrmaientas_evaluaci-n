@@ -40,7 +40,7 @@ function EvaluationCanvas() {
         questionIds: evaluationQuestions.map(q => q._id),
         numForms: numForms, // Enviar el número de formas
       };
-      const response = await axios.post(`${API_URL}/api/evaluaciones`, body, config);
+      const response = await axios.post(`${API_URL}/api/assessment`, body, config); // CAMBIO AQUÍ: /api/assessment
       toast.success('¡Evaluaciones generadas con éxito!');
       setGeneratedLinks(response.data.enlaces); // Guardar el array de enlaces
       if (response.data.enlaces.length > 0) {
@@ -104,7 +104,11 @@ function EvaluationCanvas() {
                       {...provided.dragHandleProps}
                       sx={{ padding: '8px', marginBottom: '8px', ...provided.draggableProps.style }}
                     >
-                      {q.pregunta}
+                      <Typography variant="body1">{index + 1}. {q.pregunta}</Typography>
+                      <Typography variant="body2" sx={{ ml: 2 }}>A) {q.opcionA}</Typography>
+                      <Typography variant="body2" sx={{ ml: 2 }}>B) {q.opcionB}</Typography>
+                      <Typography variant="body2" sx={{ ml: 2 }}>C) {q.opcionC}</Typography>
+                      <Typography variant="body2" sx={{ ml: 2 }}>D) {q.opcionD}</Typography>
                     </Paper>
                   )}
                 </Draggable>

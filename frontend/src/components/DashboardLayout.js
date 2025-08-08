@@ -3,6 +3,7 @@ import { AppBar, Toolbar, Typography, Box, Drawer, List, ListItem, ListItemText,
 import { styled } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import LogoutIcon from '@mui/icons-material/Logout';
+import GroupIcon from '@mui/icons-material/Group'; // Importar icono para gestión de usuarios
 import useStore from '../store';
 
 const drawerWidth = 240;
@@ -39,7 +40,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 function DashboardLayout({ children }) {
-  const { logout } = useStore();
+  const { logout, user } = useStore(); // Obtener el usuario del store
   const [open, setOpen] = React.useState(true); // Puedes controlar esto con un botón o estado global
 
   return (
@@ -79,6 +80,14 @@ function DashboardLayout({ children }) {
           <ListItem button component={Link} to="/assessments">
             <ListItemText primary="Mis Evaluaciones" />
           </ListItem>
+          {user && user.rol === 'administrador' && (
+            <ListItem button component={Link} to="/users">
+              <IconButton color="inherit" sx={{ ml: -1 }}>
+                <GroupIcon />
+              </IconButton>
+              <ListItemText primary="Gestión de Usuarios" />
+            </ListItem>
+          )}
           {/* Agrega más elementos de menú aquí */}
           <ListItem button onClick={logout}>
             <IconButton color="inherit" sx={{ ml: -1 }}>

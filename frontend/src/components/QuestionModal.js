@@ -68,6 +68,22 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
         </FormControl>
         <TextField name="oa" label="OA" fullWidth margin="dense" value={formData.oa} onChange={handleChange} />
         {/* Aquí se pueden añadir más campos como puntaje, habilidad, etc. */}
+
+        <Box sx={{ mt: 3, p: 2, border: '1px solid #e0e0e0', borderRadius: '4px', bgcolor: '#f9f9f9' }}>
+          <Typography variant="h6" gutterBottom>Vista Previa de la Pregunta:</Typography>
+          <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+            {formData.pregunta || '[Enunciado de la pregunta]'}
+          </Typography>
+          <Typography variant="body2">A) {formData.opcionA || '[Opción A]'}</Typography>
+          <Typography variant="body2">B) {formData.opcionB || '[Opción B]'}</Typography>
+          <Typography variant="body2">C) {formData.opcionC || '[Opción C]'}</Typography>
+          <Typography variant="body2">D) {formData.opcionD || '[Opción D]'}</Typography>
+          <Typography variant="body2" sx={{ mt: 1, color: 'green' }}>
+            Respuesta Correcta: {formData.respuestaCorrecta}
+          </Typography>
+          {formData.oa && <Typography variant="body2">OA: {formData.oa}</Typography>}
+          {formData.dificultad && <Typography variant="body2">Dificultad: {formData.dificultad}</Typography>}
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancelar</Button>

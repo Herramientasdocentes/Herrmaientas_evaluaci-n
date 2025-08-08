@@ -14,6 +14,8 @@ import RegisterPage from './components/RegisterPage';
 import ForgotPasswordPage from './components/ForgotPasswordPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
 import DashboardLayout from './components/DashboardLayout'; // Importar el nuevo layout
+import PastAssessments from './components/PastAssessments'; // Importar el nuevo componente
+import UserManagementPage from './components/UserManagementPage'; // Importar el nuevo componente
 
 // Componente para manejar las vistas de autenticación
 function AuthPage() {
@@ -26,7 +28,6 @@ function AuthPage() {
 
 // Componentes placeholder para las nuevas rutas
 const QuestionsPage = () => <div>Página de Banco de Preguntas</div>;
-const AssessmentsPage = () => <div>Página de Mis Evaluaciones</div>;
 
 function App() {
   const token = useStore((state) => state.token);
@@ -48,7 +49,11 @@ function App() {
               />
               <Route
                 path="/assessments"
-                element={token ? <DashboardLayout><AssessmentsPage /></DashboardLayout> : <Navigate to="/" />}
+                element={token ? <DashboardLayout><PastAssessments /></DashboardLayout> : <Navigate to="/" />}
+              />
+              <Route
+                path="/users"
+                element={token ? <DashboardLayout><UserManagementPage /></DashboardLayout> : <Navigate to="/" />}
               />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
