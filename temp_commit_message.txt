@@ -1,1 +1,1 @@
-Fix: Install missing backend dependencies (dotenv, morgan) and update package files.
+Fix: Make generateRubric function async in geminiController.js to resolve SyntaxError.
