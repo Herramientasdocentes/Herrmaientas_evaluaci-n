@@ -9,10 +9,11 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ScienceIcon from '@mui/icons-material/Science'; // Icono para el análisis IA
+import RefreshIcon from '@mui/icons-material/Refresh'; // Icono para actualizar
 
 import QuestionModal from './QuestionModal';
 import AnalyzeQuestionModal from './AnalyzeQuestionModal'; // Importar el nuevo modal
-import GoogleSheetPicker from './GoogleSheetPicker';
+
 import ImportQuestionsModal from './ImportQuestionsModal'; // Importar el nuevo modal de importación
 import Pagination from '@mui/material/Pagination';
 
@@ -168,10 +169,10 @@ function QuestionBankManager() {
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h4" component="h1">Banco de Preguntas</Typography>
+        <Button variant="outlined" onClick={fetchQuestions} startIcon={<RefreshIcon />} sx={{ ml: 2 }}>Actualizar</Button>
         <Box>
           <Button variant="contained" onClick={handleOpenCreateModal} sx={{ mr: 1 }}>Crear Pregunta</Button>
-          <Button variant="outlined" onClick={handleOpenImportModal} sx={{ mr: 1 }}>Importar Preguntas</Button>
-          <GoogleSheetPicker onSheetSelect={handleSheetSelected} />
+          <Button variant="outlined" onClick={handleOpenImportModal}>Importar Preguntas</Button>
         </Box>
       </Box>
       <Box component={Paper} sx={{ p: 2, mb: 2, display: 'flex', gap: 2 }}>
@@ -205,6 +206,16 @@ function QuestionBankManager() {
           <TableBody>
             {isLoading ? (
               <TableRow><TableCell colSpan={4} align="center"><CircularProgress /></TableCell></TableRow>
+            ) : questions.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  <Typography variant="subtitle1" color="textSecondary">
+                    No hay preguntas en tu banco. Puedes crear una nueva pregunta o importarlas.
+                  </Typography>
+                  <Button variant="text" onClick={handleOpenCreateModal} sx={{ mt: 1, mr: 1 }}>Crear Pregunta</Button>
+                  <Button variant="text" onClick={handleOpenImportModal} sx={{ mt: 1 }}>Importar Preguntas</Button>
+                </TableCell>
+              </TableRow>
             ) : (
               questions.map((q) => (
                 <TableRow key={q._id}>
@@ -247,6 +258,7 @@ function QuestionBankManager() {
         handleClose={handleCloseImportModal}
         onImportCSV={handleImportCSV}
         onImportJSON={handleImportJSON}
+        onImportGoogleSheet={handleSheetSelected}
       />
     </Container>
   );
