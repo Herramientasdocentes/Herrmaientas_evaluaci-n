@@ -1,0 +1,1 @@
+Fix: Install missing backend dependencies (dotenv, morgan) and update package files.
