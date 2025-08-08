@@ -1,79 +1,112 @@
-
-import React, { useEffect } from 'react';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import useStore from '../store';
 import QuestionPanel from './QuestionPanel';
-import PastAssessments from './PastAssessments';
 import EvaluationCanvas from './EvaluationCanvas';
+import RubricGeneratorModal from './RubricGeneratorModal';
+import GoogleSheetPicker from './GoogleSheetPicker';
+import { 
+  Container, 
+  Grid, 
+  Typography, 
+  Button, 
+  Box, 
+  AppBar, 
+  Toolbar, 
+  IconButton, 
+  CircularProgress 
+} from '@mui/material';
+import LogoutIcon from '@mui/icons-material/Logout';
+import ArticleIcon from '@mui/icons-material/Article';
+import ClearIcon from '@mui/icons-material/Clear';
 
 function Dashboard() {
-  const { token, files, setFiles, logout, setQuestions, setLoading } = useStore();
-  // Define la URL base de la API
+  const { token, logout } = useStore();
+  const [isRubricModalOpen, setIsRubricModalOpen] = useState(false);
+  const [sheetQuestions, setSheetQuestions] = useState(null);
+  const [sheetInfo, setSheetInfo] = useState({ title: '', isLoading: false });
+
   const API_URL = process.env.REACT_APP_API_URL || 'https://herrmaientas-evaluaci-n.onrender.com';
 
-  // Función para cargar las preguntas de un OA específico
-  const loadQuestionsByOA = async (oa) => {
-    setLoading(true);
-    setQuestions([]); // Limpiamos las preguntas anteriores
+  useEffect(() => {
+    if (!token) logout();
+  }, [token, logout]);
+
+  const handleOpenRubricModal = () => setIsRubricModalOpen(true);
+  const handleCloseRubricModal = () => setIsRubricModalOpen(false);
+
+  const handleSheetSelected = async ({ id, name }) => {
+    setSheetInfo({ title: name, isLoading: true });
+    setSheetQuestions(null); // Limpiar preguntas anteriores
     try {
       const config = { headers: { 'x-auth-token': token } };
-      // Llamamos a la ruta de questions, filtrando por oa
-      const response = await axios.get(`${API_URL}/api/questions?oa=${oa}`, config);
-      setQuestions(response.data.questions); // La API devuelve un objeto con una propiedad 'questions'
+      const response = await axios.get(`${API_URL}/api/sheets/${id}/questions`, config);
+      setSheetQuestions(response.data);
     } catch (error) {
-      console.error('Error al cargar las preguntas:', error);
-      toast.error('No se pudieron cargar las preguntas.');
+      console.error('Error loading questions from sheet:', error);
     } finally {
-      setLoading(false);
+      setSheetInfo(prev => ({ ...prev, isLoading: false }));
     }
   };
 
-  // useEffect para cargar los OAs (bancos) al iniciar
-  useEffect(() => {
-    const fetchOAs = async () => {
-      try {
-        const config = {
-          headers: {
-            'x-auth-token': token,
-          },
-        };
-        const response = await axios.get(`${API_URL}/api/banco`, config);
-        setFiles(response.data); // El backend ahora devuelve el formato correcto
-      } catch (error) {
-        console.error('Error al obtener los bancos de preguntas:', error);
-        toast.error('Tu sesión puede haber expirado. Por favor, inicia sesión de nuevo.');
-        logout();
-      }
-    };
-    if (token) {
-      fetchOAs();
-    }
-  }, [token, setFiles, logout]);
+  const handleClearSheet = () => {
+    setSheetQuestions(null);
+    setSheetInfo({ title: '', isLoading: false });
+  };
 
   return (
-    <div>
-      <h2>Panel del Docente</h2>
-      <button onClick={logout}>Cerrar Sesión</button>
-      <h3>Bancos de Preguntas por OA:</h3>
-      <ul>
-        {files.length > 0 ? (
-          files.map((banco) => (
-            <li key={banco.id} onClick={() => loadQuestionsByOA(banco.id)} style={{ cursor: 'pointer', textDecoration: 'underline' }}>
-              {banco.name}
-            </li>
-          ))
-        ) : (
-          <p>No se encontraron bancos de preguntas. Agregue preguntas para verlos aquí.</p>
-        )}
-      </ul>
-      {/* Paneles lado a lado */}
-      <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '20px' }}>
-        <QuestionPanel />
-        <PastAssessments />
-        <EvaluationCanvas />
-      </div>
-    </div>
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Asistente de Evaluaciones Anluis
+          </Typography>
+          <GoogleSheetPicker onSheetSelected={handleSheetSelected} />
+          <Button 
+            variant="contained"
+            color="secondary"
+            startIcon={<ArticleIcon />}
+            onClick={handleOpenRubricModal}
+            sx={{ mx: 2 }}
+          >
+            Generador de Rúbricas
+          </Button>
+          <IconButton color="inherit" onClick={logout} title="Cerrar Sesión">
+            <LogoutIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+      <Container maxWidth="xl" sx={{ mt: 4 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            {sheetInfo.isLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <QuestionPanel 
+                externalQuestions={sheetQuestions} 
+                externalSourceTitle={sheetInfo.title} 
+              />
+            )}
+            {sheetQuestions && (
+              <Button startIcon={<ClearIcon />} onClick={handleClearSheet} sx={{ mt: 1 }}>
+                Limpiar y ver Banco Principal
+              </Button>
+            )}
+          </Grid>
+          
+          <Grid item xs={12} md={8}>
+            <EvaluationCanvas />
+          </Grid>
+        </Grid>
+      </Container>
+
+      <RubricGeneratorModal 
+        open={isRubricModalOpen} 
+        handleClose={handleCloseRubricModal} 
+      />
+    </Box>
   );
 }
 

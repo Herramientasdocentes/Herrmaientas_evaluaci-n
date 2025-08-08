@@ -3,7 +3,8 @@ import useStore from '../store';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { Box, Button, TextField, Typography, Paper, Link } from '@mui/material';
+import { Box, Button, TextField, Typography, Paper, Link, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import ClassroomIntegration from './ClassroomIntegration';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://herrmaientas-evaluaci-n.onrender.com';
 
@@ -11,7 +12,10 @@ function EvaluationCanvas() {
   const { evaluationQuestions, setEvaluationQuestions, token } = useStore();
   const [nombre, setNombre] = useState('');
   const [objetivo, setObjetivo] = useState('');
+  const [numForms, setNumForms] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedLinks, setGeneratedLinks] = useState([]);
+  const [showClassroomIntegration, setShowClassroomIntegration] = useState(false);
 
   const handleOnDragEnd = (result) => {
     if (!result.destination) return;
@@ -26,21 +30,22 @@ function EvaluationCanvas() {
       return toast.warn('Por favor, completa el nombre, el objetivo y añade al menos una pregunta.');
     }
     setIsGenerating(true);
+    setGeneratedLinks([]);
+    setShowClassroomIntegration(false);
     try {
       const config = { headers: { 'x-auth-token': token } };
       const body = {
         nombreEvaluacion: nombre,
         objetivo,
         questionIds: evaluationQuestions.map(q => q._id),
+        numForms: numForms, // Enviar el número de formas
       };
       const response = await axios.post(`${API_URL}/api/evaluaciones`, body, config);
-      toast.success(
-        <div>
-          <p>¡Evaluación generada con éxito!</p>
-          <Link href={response.data.enlaceDoc} target="_blank" rel="noopener">Ver Google Doc</Link><br/>
-          <Link href={response.data.enlaceForm} target="_blank" rel="noopener">Ver Google Form</Link>
-        </div>
-      );
+      toast.success('¡Evaluaciones generadas con éxito!');
+      setGeneratedLinks(response.data.enlaces); // Guardar el array de enlaces
+      if (response.data.enlaces.length > 0) {
+        setShowClassroomIntegration(true); // Mostrar la integración con Classroom
+      }
       // Limpiar el canvas
       setNombre('');
       setObjetivo('');
@@ -72,6 +77,19 @@ function EvaluationCanvas() {
         value={objetivo}
         onChange={(e) => setObjetivo(e.target.value)}
       />
+      <FormControl fullWidth margin="normal">
+        <InputLabel id="num-forms-label">Número de Formas</InputLabel>
+        <Select
+          labelId="num-forms-label"
+          value={numForms}
+          label="Número de Formas"
+          onChange={(e) => setNumForms(e.target.value)}
+        >
+          <MenuItem value={1}>1 Forma</MenuItem>
+          <MenuItem value={2}>2 Formas (A/B)</MenuItem>
+          <MenuItem value={3}>3 Formas (A/B/C)</MenuItem>
+        </Select>
+      </FormControl>
       <Typography variant="subtitle1" sx={{ mt: 2 }}>Preguntas (Arrastra para ordenar):</Typography>
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Droppable droppableId="evaluation">
@@ -109,6 +127,29 @@ function EvaluationCanvas() {
       >
         {isGenerating ? 'Generando...' : 'Generar Evaluación'}
       </Button>
+
+      {generatedLinks.length > 0 && (
+        <Box sx={{ mt: 3 }}>
+          <Typography variant="h6">Enlaces Generados:</Typography>
+          {generatedLinks.map((link, index) => (
+            <Box key={index} sx={{ mb: 2 }}>
+              <Typography variant="subtitle1">{link.forma}</Typography>
+              <Link href={link.urlDoc} target="_blank" rel="noopener">Ver Google Doc</Link><br/>
+              <Link href={link.urlForm} target="_blank" rel="noopener">Ver Google Form</Link>
+            </Box>
+          ))}
+        </Box>
+      )}
+
+      {showClassroomIntegration && generatedLinks.length > 0 && (
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h6">Publicar en Classroom</Typography>
+          <ClassroomIntegration
+            evaluationLinks={generatedLinks} // Pasar todos los enlaces
+            evaluationTitle={nombre}
+          />
+        </Box>
+      )}
     </Paper>
   );
 }

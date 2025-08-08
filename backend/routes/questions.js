@@ -43,6 +43,55 @@ router.post(
   }
 );
 
+// @route   PUT api/questions/:id
+// @desc    Actualizar una pregunta existente
+// @access  Private
+router.put(
+  '/:id',
+  [
+    auth,
+    [
+      check('pregunta', 'La pregunta es obligatoria').not().isEmpty(),
+      check('opcionA', 'La opción A es obligatoria').not().isEmpty(),
+      check('opcionB', 'La opción B es obligatoria').not().isEmpty(),
+      check('opcionC', 'La opción C es obligatoria').not().isEmpty(),
+      check('opcionD', 'La opción D es obligatoria').not().isEmpty(),
+      check('respuestaCorrecta', 'La respuesta correcta es obligatoria').isIn(['A', 'B', 'C', 'D']),
+      check('puntaje', 'El puntaje es obligatorio y debe ser un número').isNumeric(),
+      check('oa', 'El Objetivo de Aprendizaje (OA) es obligatorio').not().isEmpty(),
+    ],
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      let question = await Question.findById(req.params.id);
+
+      if (!question) {
+        return res.status(404).json({ msg: 'Pregunta no encontrada' });
+      }
+
+      // Verificar que el usuario sea el dueño de la pregunta
+      if (question.creador.toString() !== req.user.id) {
+        return res.status(401).json({ msg: 'Usuario no autorizado' });
+      }
+
+      question = await Question.findByIdAndUpdate(
+        req.params.id,
+        { $set: req.body },
+        { new: true, runValidators: true }
+      );
+
+      res.json(question);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Error del Servidor');
+    }
+  }
+);
 
 // @route   GET /api/questions
 // @desc    Obtener preguntas, con opción de filtrar y paginar
@@ -54,10 +103,11 @@ router.get('/', auth, async (req, res) => {
     const limit = parseInt(req.query.limit) || 10; // Mostraremos 10 preguntas por página
     const skip = (page - 1) * limit;
 
-    // Objeto de filtro dinámico (sin cambios)
+    // Objeto de filtro dinámico
     const filter = {};
     if (req.query.oa) filter.oa = req.query.oa;
-    // ... otros filtros ...
+    if (req.query.habilidad) filter.habilidad = req.query.habilidad;
+    if (req.query.dificultad) filter.dificultad = req.query.dificultad;
 
     // Buscamos en la base de datos aplicando el filtro, la paginación y el orden
     const questions = await Question.find(filter)

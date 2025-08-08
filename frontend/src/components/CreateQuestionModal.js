@@ -12,6 +12,8 @@ import {
   FormControl,
   InputLabel,
   Typography,
+  CircularProgress,
+  Divider
 } from '@mui/material';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://herrmaientas-evaluaci-n.onrender.com';
@@ -45,9 +47,44 @@ function CreateQuestionModal({ open, handleClose, onQuestionCreated }) {
     habilidad: '',
     dificultad: 'Intermedio',
   });
+  const [aiContext, setAiContext] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleGenerateAI = async () => {
+    if (!formData.oa || !formData.dificultad || !aiContext) {
+      return toast.warn('Para generar con IA, por favor completa el OA, la dificultad y el contexto.');
+    }
+    setIsGenerating(true);
+    try {
+      const config = { headers: { 'x-auth-token': token } };
+      const body = {
+        objetivoAprendizaje: formData.oa,
+        dificultad: formData.dificultad,
+        contexto: aiContext,
+      };
+      const response = await axios.post(`${API_URL}/api/gemini/generate-question`, body, config);
+      const { pregunta, opcionA, opcionB, opcionC, opcionD, respuestaCorrecta } = response.data;
+      
+      setFormData(prev => ({
+        ...prev,
+        pregunta,
+        opcionA,
+        opcionB,
+        opcionC,
+        opcionD,
+        respuestaCorrecta,
+      }));
+      toast.success('¡Pregunta generada por IA! Revisa y ajusta si es necesario.');
+    } catch (error) {
+      console.error('Error al generar pregunta con IA:', error);
+      toast.error('No se pudo generar la pregunta con IA.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -56,8 +93,8 @@ function CreateQuestionModal({ open, handleClose, onQuestionCreated }) {
       const config = { headers: { 'x-auth-token': token } };
       const response = await axios.post(`${API_URL}/api/questions`, formData, config);
       toast.success('¡Pregunta creada exitosamente!');
-      onQuestionCreated(response.data); // Llama al callback para actualizar la lista
-      handleClose(); // Cierra el modal
+      onQuestionCreated(response.data);
+      handleClose();
     } catch (error) {
       console.error('Error al crear la pregunta:', error.response?.data || error.message);
       const errorMsg = error.response?.data?.errors?.[0]?.msg || 'No se pudo crear la pregunta.';
@@ -68,9 +105,42 @@ function CreateQuestionModal({ open, handleClose, onQuestionCreated }) {
   return (
     <Modal open={open} onClose={handleClose}>
       <Box sx={style} component="form" onSubmit={handleSubmit}>
-        <Typography variant="h6" component="h2">
-          Crear Nueva Pregunta
+        <Typography variant="h6" component="h2">Crear Nueva Pregunta</Typography>
+        
+        <Divider sx={{ my: 2 }}>Asistente de IA</Divider>
+        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+          Completa los siguientes campos y la IA generará una pregunta por ti.
         </Typography>
+        <TextField
+          margin="normal"
+          fullWidth
+          label="Objetivo de Aprendizaje (OA)"
+          name="oa"
+          value={formData.oa}
+          onChange={handleChange}
+        />
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Dificultad</InputLabel>
+          <Select name="dificultad" value={formData.dificultad} onChange={handleChange}>
+            <MenuItem value="Fácil">Fácil</MenuItem>
+            <MenuItem value="Media">Media</MenuItem>
+            <MenuItem value="Difícil">Difícil</MenuItem>
+          </Select>
+        </FormControl>
+        <TextField
+          margin="normal"
+          fullWidth
+          label="Contexto de la Pregunta (Ej: Deportes, Historia, etc.)"
+          value={aiContext}
+          onChange={(e) => setAiContext(e.target.value)}
+          multiline
+          rows={2}
+        />
+        <Button onClick={handleGenerateAI} disabled={isGenerating} variant="outlined" sx={{ mt: 1 }}>
+          {isGenerating ? <CircularProgress size={24} /> : 'Generar con IA'}
+        </Button>
+        <Divider sx={{ my: 2 }}>Datos de la Pregunta (Puedes editar lo generado)</Divider>
+
         <TextField
           margin="normal"
           required
@@ -97,39 +167,8 @@ function CreateQuestionModal({ open, handleClose, onQuestionCreated }) {
           </Select>
         </FormControl>
 
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          label="Puntaje"
-          name="puntaje"
-          type="number"
-          value={formData.puntaje}
-          onChange={handleChange}
-        />
-
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          label="Objetivo de Aprendizaje (OA)"
-          name="oa"
-          value={formData.oa}
-          onChange={handleChange}
-        />
-
-        <TextField margin="normal" fullWidth label="Indicador" name="indicador" value={formData.indicador} onChange={handleChange} />
         <TextField margin="normal" fullWidth label="Habilidad" name="habilidad" value={formData.habilidad} onChange={handleChange} />
-
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Dificultad</InputLabel>
-          <Select name="dificultad" value={formData.dificultad} onChange={handleChange}>
-            <MenuItem value="Fácil">Fácil</MenuItem>
-            <MenuItem value="Intermedio">Intermedio</MenuItem>
-            <MenuItem value="Adecuado">Adecuado</MenuItem>
-            <MenuItem value="Desafiante">Desafiante</MenuItem>
-          </Select>
-        </FormControl>
+        <TextField margin="normal" required fullWidth label="Puntaje" name="puntaje" type="number" value={formData.puntaje} onChange={handleChange} />
 
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
           <Button onClick={handleClose} sx={{ mr: 1 }}>Cancelar</Button>

@@ -1,7 +1,14 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Definimos el esquema de la evaluación
+// Sub-esquema para los enlaces de las diferentes formas de la evaluación
+const EnlaceSchema = new Schema({
+  forma: { type: String, required: true }, // Ej: "Forma A", "Forma B"
+  urlDoc: { type: String, required: true },
+  urlForm: { type: String, required: true }
+}, { _id: false });
+
+// Definimos el esquema principal de la evaluación
 const assessmentSchema = new Schema({
   nombreEvaluacion: {
     type: String,
@@ -13,21 +20,15 @@ const assessmentSchema = new Schema({
   },
   fechaCreacion: {
     type: Date,
-    default: Date.now // La fecha se establece automáticamente al crear el registro
+    default: Date.now
   },
   creador: {
-    type: mongoose.Schema.Types.ObjectId, // Almacena el ID único de un usuario
-    ref: 'User',                         // Especifica que este ID se refiere a un documento del modelo 'User'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
-  enlaceDoc: {
-    type: String,
-    required: true
-  },
-  enlaceForm: {
-    type: String,
-    required: true
-  }
+  // Almacenamos un array de enlaces para soportar múltiples formas
+  enlaces: [EnlaceSchema]
 });
 
 // Creamos y exportamos el modelo

@@ -1,6 +1,7 @@
 
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const morgan = require('morgan'); // <-- 1. Importa morgan
 const connectDB = require('./config/db');
 
@@ -51,7 +52,15 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/questions', require('./routes/questions'));
 app.use('/api/evaluaciones', require('./routes/assessment'));
 app.use('/api/banco', require('./routes/banco'));
+app.use('/api/sheets', require('./routes/sheets'));
+app.use('/api/classroom', require('./routes/classroom'));
+app.use('/api/gemini', require('./routes/gemini'));
 
 const PORT = process.env.PORT || 5000;
+
+
+// Middleware de manejo de errores (debe ir al final)
+const errorHandler = require('./middleware/errorHandler');
+app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Servidor iniciado en el puerto ${PORT}`));

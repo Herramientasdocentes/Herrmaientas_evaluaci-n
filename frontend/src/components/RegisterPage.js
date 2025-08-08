@@ -6,12 +6,22 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
+/**
+ * Componente de registro de usuario
+ * Valida entradas en frontend y maneja errores del backend
+ * @param {Object} props
+ * @param {Function} props.onSwitchToLogin - Función para cambiar a la vista de login
+ */
 function RegisterPage({ onSwitchToLogin }) {
   const [formData, setFormData] = useState({ nombre: '', email: '', password: '' });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const { nombre, email, password } = formData;
 
+  /**
+   * Valida los datos del formulario antes de enviar
+   * @returns {boolean} true si los datos son válidos
+   */
   const validate = () => {
     let tempErrors = {};
     if (!nombre) tempErrors.nombre = "El nombre es requerido.";
@@ -29,8 +39,17 @@ function RegisterPage({ onSwitchToLogin }) {
     return Object.keys(tempErrors).length === 0;
   };
 
+  /**
+   * Maneja el cambio de los campos del formulario
+   * @param {Object} e - Evento de cambio
+   */
   const onChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  /**
+   * Envía el formulario al backend si los datos son válidos
+   * Muestra mensajes claros de error en caso de fallo
+   * @param {Object} e - Evento de submit
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
@@ -80,5 +99,13 @@ function RegisterPage({ onSwitchToLogin }) {
     </Container>
   );
 }
+
+/**
+ * Recomendaciones:
+ * - Validar todos los campos obligatorios antes de enviar.
+ * - Mostrar mensajes claros y amigables al usuario.
+ * - Documentar cada función y componente.
+ * - Manejar errores inesperados y mostrar un mensaje genérico si es necesario.
+ */
 
 export default RegisterPage;
