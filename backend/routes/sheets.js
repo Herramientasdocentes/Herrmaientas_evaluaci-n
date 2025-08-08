@@ -5,6 +5,27 @@ const auth = require('../middleware/auth');
 const Question = require('../models/Question');
 const { getAuthenticatedClient } = require('../utils/googleAuth'); // <-- Usar la función de autenticación correcta
 
+// @route   GET /api/sheets/drive-files
+// @desc    Listar archivos de Google Sheets desde Google Drive
+// @access  Private
+router.get('/drive-files', auth, async (req, res) => {
+  try {
+    const oAuth2Client = await getAuthenticatedClient(req.user);
+    const drive = google.drive({ version: 'v3', auth: oAuth2Client });
+
+    const response = await drive.files.list({
+      q: "mimeType='application/vnd.google-apps.spreadsheet'", // Solo hojas de cálculo
+      fields: 'files(id, name)',
+      spaces: 'drive',
+    });
+
+    res.status(200).json(response.data.files);
+  } catch (error) {
+    console.error('Error al listar archivos de Google Drive:', error.message);
+    res.status(500).send('Error del servidor al listar archivos de Drive.');
+  }
+});
+
 // @route   GET /api/sheets/:sheetId/questions
 // @desc    Leer preguntas de una hoja de cálculo de Google Sheets sin importarlas
 // @access  Private
