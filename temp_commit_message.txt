@@ -1,11 +1,7 @@
-feat: Mejora visual del frontend a estilo dashboard
+fix: Corregir errores de compilación de Vercel (react/no-unescaped-entities)
 
-Implementa un diseño de dashboard moderno y con colores suaves utilizando Material-UI.
+Se corrigieron los errores de compilación relacionados con `react/no-unescaped-entities` en los siguientes archivos:
+- `frontend/src/components/PastAssessments.js`
+- `frontend/src/components/UserManagementPage.js`
 
-- Se define un tema global en `frontend/src/theme.js` con una paleta de colores suaves.
-- Se integra `ThemeProvider` en `frontend/src/App.js` para aplicar el tema.
-- Se crea `frontend/src/components/DashboardLayout.js` para el diseño principal del dashboard (AppBar y Drawer).
-- Se actualiza `frontend/src/App.js` para usar `DashboardLayout` en las rutas autenticadas.
-- Se refactorizan `LoginPage.js`, `RegisterPage.js`, `ForgotPasswordPage.js` y `ResetPasswordPage.js` para usar componentes de Material-UI y alinearse con el nuevo tema.
-- Se refactoriza `Dashboard.js` para integrarse con el nuevo `DashboardLayout` y se mueve la lógica de cierre de sesión al layout.
-- Se limpia `frontend/src/App.css` para evitar conflictos de estilo.
+Se reemplazaron las comillas dobles sin escape con la entidad HTML `&quot;` para resolver el problema.

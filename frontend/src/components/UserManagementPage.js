@@ -233,7 +233,7 @@ function UserManagementPage() {
         <DialogTitle id="alert-dialog-title">{"Confirmar Eliminación"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            ¿Estás seguro de que deseas eliminar al usuario "{userToDelete?.nombre}"? Esta acción no se puede deshacer.
+            ¿Estás seguro de que deseas eliminar al usuario &quot;{userToDelete?.nombre}&quot;? Esta acción no se puede deshacer.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

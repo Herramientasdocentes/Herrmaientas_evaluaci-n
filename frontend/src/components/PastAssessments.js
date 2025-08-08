@@ -200,7 +200,7 @@ function PastAssessments() {
         <DialogTitle id="alert-dialog-title">{"Confirmar Eliminación"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            ¿Estás seguro de que deseas eliminar la evaluación "{assessmentToDelete?.nombreEvaluacion}"? Esta acción no se puede deshacer.
+            ¿Estás seguro de que deseas eliminar la evaluación &quot;{assessmentToDelete?.nombreEvaluacion}&quot;? Esta acción no se puede deshacer.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
