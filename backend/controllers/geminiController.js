@@ -139,7 +139,7 @@ exports.adaptQuestionForNEE = async (req, res) => {
   }
 };
   
-  const { pregunta, opcionA, opcionB, opcionC, opcionD, oa } = req.body;
+  exports.analyzeQuestion = async (req, res) => {
 
   if (!pregunta || !opcionA || !opcionB || !opcionC || !opcionD) {
     return res.status(400).json({ msg: 'Se requiere el texto de la pregunta y todas las alternativas.' });
