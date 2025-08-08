@@ -1,19 +1,11 @@
 .App {
-  text-align: center;
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f4f6f8; /* Usar el color de fondo del tema */
 }
 
-/* Mejora el contraste del label de contraseña para accesibilidad WCAG 2 AA */
-#password-label {
-  color: #fff !important;
+main {
+  flex-grow: 1;
+  padding: 24px; /* Espaciado general para el contenido principal */
 }

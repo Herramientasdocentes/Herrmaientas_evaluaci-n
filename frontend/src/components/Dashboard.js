@@ -11,17 +11,13 @@ import {
   Typography, 
   Button, 
   Box, 
-  AppBar, 
-  Toolbar, 
-  IconButton, 
   CircularProgress 
 } from '@mui/material';
-import LogoutIcon from '@mui/icons-material/Logout';
 import ArticleIcon from '@mui/icons-material/Article';
 import ClearIcon from '@mui/icons-material/Clear';
 
 function Dashboard() {
-  const { token, logout } = useStore();
+  const { token, logout } = useStore(); // Mantener logout aquí por ahora, se moverá al layout
   const [isRubricModalOpen, setIsRubricModalOpen] = useState(false);
   const [sheetQuestions, setSheetQuestions] = useState(null);
   const [sheetInfo, setSheetInfo] = useState({ title: '', isLoading: false });
@@ -55,58 +51,48 @@ function Dashboard() {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Asistente de Evaluaciones Anluis
-          </Typography>
-          <GoogleSheetPicker onSheetSelected={handleSheetSelected} />
-          <Button 
-            variant="contained"
-            color="secondary"
-            startIcon={<ArticleIcon />}
-            onClick={handleOpenRubricModal}
-            sx={{ mx: 2 }}
-          >
-            Generador de Rúbricas
-          </Button>
-          <IconButton color="inherit" onClick={logout} title="Cerrar Sesión">
-            <LogoutIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth="xl" sx={{ mt: 4 }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            {sheetInfo.isLoading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                <CircularProgress />
-              </Box>
-            ) : (
-              <QuestionPanel 
-                externalQuestions={sheetQuestions} 
-                externalSourceTitle={sheetInfo.title} 
-              />
-            )}
-            {sheetQuestions && (
-              <Button startIcon={<ClearIcon />} onClick={handleClearSheet} sx={{ mt: 1 }}>
-                Limpiar y ver Banco Principal
-              </Button>
-            )}
-          </Grid>
-          
-          <Grid item xs={12} md={8}>
-            <EvaluationCanvas />
-          </Grid>
+    <Container maxWidth="xl" sx={{ mt: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+        <GoogleSheetPicker onSheetSelected={handleSheetSelected} />
+        <Button 
+          variant="contained"
+          color="primary"
+          startIcon={<ArticleIcon />}
+          onClick={handleOpenRubricModal}
+        >
+          Generador de Rúbricas
+        </Button>
+      </Box>
+
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={4}>
+          {sheetInfo.isLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <QuestionPanel 
+              externalQuestions={sheetQuestions} 
+              externalSourceTitle={sheetInfo.title} 
+            />
+          )}
+          {sheetQuestions && (
+            <Button startIcon={<ClearIcon />} onClick={handleClearSheet} sx={{ mt: 1 }}>
+              Limpiar y ver Banco Principal
+            </Button>
+          )}
         </Grid>
-      </Container>
+        
+        <Grid item xs={12} md={8}>
+          <EvaluationCanvas />
+        </Grid>
+      </Grid>
 
       <RubricGeneratorModal 
         open={isRubricModalOpen} 
         handleClose={handleCloseRubricModal} 
       />
-    </Box>
+    </Container>
   );
 }
 

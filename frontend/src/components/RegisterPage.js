@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Avatar, Button, TextField, Box, Typography, Container, CircularProgress } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { Link } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -69,9 +70,20 @@ function RegisterPage({ onSwitchToLogin }) {
 
   return (
     <Container component="main" maxWidth="xs">
-      <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}><PersonAddIcon /></Avatar>
-        <Typography component="h1" variant="h5">Crear Cuenta</Typography>
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          p: 4, // Padding
+          boxShadow: 3, // Sombra suave
+          borderRadius: 2, // Bordes redondeados
+          bgcolor: 'background.paper', // Usa el color de fondo del tema
+        }}
+      >
+        <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}><PersonAddIcon /></Avatar>
+        <Typography component="h1" variant="h5" sx={{ mb: 2 }}>Crear Cuenta</Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
           <TextField
             margin="normal" required fullWidth id="nombre" label="Nombre Completo" name="nombre" value={nombre} onChange={onChange}
@@ -91,9 +103,11 @@ function RegisterPage({ onSwitchToLogin }) {
           <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} disabled={loading}>
             {loading ? <CircularProgress size={24} color="inherit" /> : 'Registrarse'}
           </Button>
-          <Button fullWidth onClick={onSwitchToLogin} disabled={loading}>
-            ¿Ya tienes una cuenta? Inicia sesión
-          </Button>
+          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <Button fullWidth onClick={onSwitchToLogin} disabled={loading}>
+              ¿Ya tienes una cuenta? Inicia sesión
+            </Button>
+          </Link>
         </Box>
       </Box>
     </Container>

@@ -25,8 +25,19 @@ function ResetPasswordPage() {
 
   return (
     <Container component="main" maxWidth="xs">
-      <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Typography component="h1" variant="h5">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          p: 4, // Padding
+          boxShadow: 3, // Sombra suave
+          borderRadius: 2, // Bordes redondeados
+          bgcolor: 'background.paper', // Usa el color de fondo del tema
+        }}
+      >
+        <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
           Crear Nueva Contraseña
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
