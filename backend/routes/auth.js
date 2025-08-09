@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const passport = require('passport');
 
 
 const User = require('../models/User');
@@ -134,5 +135,17 @@ router.put('/reset-password/:token', async (req, res) => {
     res.status(500).json({ msg: 'Error al restablecer la contraseña.' });
   }
 });
+
+// Rutas de autenticación de Google
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/google/callback',
+  passport.authenticate('google', { failureRedirect: '/' }),
+  (req, res) => {
+    // Autenticación exitosa, redirigir al frontend o enviar un token
+    // Aquí puedes generar un JWT y enviarlo al cliente
+    res.redirect(process.env.FRONTEND_URL || '/');
+  }
+);
 
 module.exports = router;

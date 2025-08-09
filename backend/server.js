@@ -1,8 +1,13 @@
 const express = require('express');
 const cors = require('cors');
+const session = require('express-session');
+const passport = require('passport');
 require('dotenv').config();
 const morgan = require('morgan'); // <-- 1. Importa morgan
 const connectDB = require('./config/db');
+
+// Passport config
+require('./config/passport');
 
 const app = express();
 
@@ -39,6 +44,18 @@ app.use(cors(corsOptions));
 
 // Middleware para parsear JSON
 app.use(express.json());
+
+// Configuración de sesión
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production' } // Usar cookies seguras en producción
+}));
+
+// Inicializar Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Middleware de Logging (en modo 'dev' para desarrollo)
 app.use(morgan('dev')); // <-- 2. Usa morgan aquí

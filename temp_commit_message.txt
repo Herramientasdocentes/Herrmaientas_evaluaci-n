@@ -1,7 +1,7 @@
-fix: Corregir errores de compilación de Vercel (react/no-unescaped-entities)
+feat: Mejoras en la gestión e importación de preguntas
 
-Se corrigieron los errores de compilación relacionados con `react/no-unescaped-entities` en los siguientes archivos:
-- `frontend/src/components/PastAssessments.js`
-- `frontend/src/components/UserManagementPage.js`
+Este commit introduce las siguientes mejoras en el módulo de gestión de preguntas:
 
-Se reemplazaron las comillas dobles sin escape con la entidad HTML `&quot;` para resolver el problema.
+- **Consolidación de la importación:** El modal de importación de preguntas ahora unifica las opciones de importación desde archivos (CSV/JSON) y Google Sheets en una interfaz con pestañas, mejorando la experiencia de usuario.
+- **Retroalimentación para banco vacío:** Se ha añadido un mensaje claro y botones de acción en el Banco de Preguntas cuando no hay preguntas, guiando al usuario sobre cómo añadir contenido.
+- **Botón de actualización:** Se ha incluido un botón "Actualizar" en el Banco de Preguntas para permitir a los usuarios refrescar manualmente la lista de preguntas.
